@@ -20,20 +20,25 @@ export class AppComponent {
     );
   }
 
-  
   login() {
-    this.scatterService.login(() => {
-      console.log("success",  this.scatterService.identity)
-      this.eosAccountName = this.scatterService.identity.accounts[0].name;
-      this.eosAuthority = this.scatterService.identity.accounts[0].authority;
-      this.eosHash = this.scatterService.identity.hash;
-      this.eosPubKey = this.scatterService.identity.publicKey;
-    }, () => {
-      console.log("failed")
+    this.scatterService.login().then((identity) => {
+      if (!identity) return false
+      console.log("identity", identity);
+      this.scatterService.scatter.useIdentity(identity)
+      this.eosAccountName = identity.accounts[0].name;
+      this.eosAuthority = identity.accounts[0].authority;
+      this.eosHash = identity.hash;
+      this.eosPubKey = identity.publicKey;
+    }, error => {
+      console.log("failed", error)
     })
   }
 
-  logout() {
+  async logout() {
     this.scatterService.logout();
+    this.eosHash = "";
+    this.eosPubKey = "";
+    this.eosAccountName = "";
+    this.eosAuthority = "";
   }
 }

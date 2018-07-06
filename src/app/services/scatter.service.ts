@@ -4,21 +4,14 @@ import { environment } from '../../environments/environment';
 
 @Injectable()
 export class ScatterService {
-    identity: any;
     eos: any;
     scatter: any;
     network: any;
 
 
     load() {
-        console.log(this.identity);
         this.scatter = (<any>window).scatter;
-        if (this.identity) {
-            this.scatter.useIdentity(this.identity.hash);
-        }
-
         // eosmetal에서 제공하는 이오스 네트워크 => 우리 EOS 노드 네트워크 정보로 바꿔야겠지? 아니면 eosmetal을 사용?
-
         this.network = {
             blockchain: 'eos',
             host: environment.eosHost,
@@ -28,24 +21,18 @@ export class ScatterService {
         this.eos = this.scatter.eos(this.network, Eos, {}, environment.eosProtocol);
     }
 
-    login(successCallback, errorCallbak) {
+    login() {
         const requirements = { accounts: [this.network] };
-        this.scatter.getIdentity(requirements)
-            .then(identity => {
-                if (!identity) return errorCallbak(null)
-                this.identity = identity;
-                this.scatter.useIdentity(identity.hash);
-                successCallback();
-            }, error => {
-                errorCallbak(error);
-            })
+        if(!this.scatter) return false;
+        if(!this.network) return false;
+        return this.scatter.getIdentity(requirements)
     }
 
     logout() {
-        console.log("logout this.scatter", this.scatter)
-        console.log("getIdentity", this.scatter.getIdentity())
         try {
-            this.scatter.forgetIdentity().then(() => { this.identity = null });
+            if(!this.scatter) return false;
+            if(!this.scatter.identity) return false;
+            return this.scatter.forgetIdentity();
         } catch (error) {
             console.log("logout error", error)
         }
