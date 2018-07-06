@@ -18,24 +18,41 @@ export class ScatterService {
             host: environment.eosHost,
             port: environment.eosPort,
             chainId: 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906'
+            // chainId: 'cf057bbfb72640471fd910bcb67639c22df9f92470936cddc1ade0e2f2e7dc4f'
         };
-        this.eos = this.scatter.eos(this.network, Eos, {}, environment.eosProtocol);
+        this.eos = this.scatter.eos(this.network, Eos, {chainId : this.network.chainId}, environment.eosProtocol);
     }
 
     login() {
-        const requirements = { accounts: [this.network] };
-        if(!this.scatter) return false;
-        if(!this.network) return false;
-        return this.scatter.getIdentity(requirements)
+        try {
+            const requirements = { accounts: [this.network] };
+            if (!this.scatter) return false;
+            if (!this.network) return false;
+            return this.scatter.getIdentity(requirements)
+        } catch (error) {
+            console.log("login error", error)
+        }
     }
 
     logout() {
         try {
-            if(!this.scatter) return false;
-            if(!this.scatter.identity) return false;
+            if (!this.scatter) return false;
+            if (!this.scatter.identity) return false;
             return this.scatter.forgetIdentity();
         } catch (error) {
             console.log("logout error", error)
         }
+    }
+
+    transfer(to: string, amount: number, memo: string = '') {
+        try {
+            return this.eos.transfer(this.scatter.identity.accounts[0].name, to, (amount).toString() + ' EOS', memo, {sign: true})
+        } catch (error) {
+            console.log("transfer error", error)
+        }
+    }
+
+    getInfo() {
+        return this.eos.getInfo()
     }
 }

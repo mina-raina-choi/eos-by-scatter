@@ -5,8 +5,13 @@
 
 export const environment = {
   production: false,
-  apiUrl: '//localhost:8000',
-  eosHost: 'api.eosmetal.io',
-  eosPort: 18890,
+  apiUrl: '//localhost',
+  eosHost: 'node2.liquideos.com',
+  eosPort: 8883,
   eosProtocol: 'https',
 };
+
+// http://bp.cryptolions.io:8888
+// https://api.eosnewyork.io:443
+// https://api.eosdetroit.io:443
+// https://node2.liquideos.com:8883
