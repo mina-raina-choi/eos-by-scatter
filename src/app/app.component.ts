@@ -64,8 +64,11 @@ export class AppComponent implements OnInit {
       console.log("transfer error", error)
       // chainId mismatch error ==> https://github.com/EOSEssentials/Scatter/issues/87
       // {"code":500,"message":"Internal Service Error","error":{"code":3090003,"name":"unsatisfied_authorization","what":"provided keys, permissions, and delays do not satisfy declared authorizations","details":[]}
+      
       // deny 했을 경우
       // {type: "signature_rejected", message: "User rejected the signature request", code: 402, isError: true}
+      
+      // https://github.com/EOSIO/eos/issues/4001
       // transfer error {"code":500,"message":"Internal Service Error","error":{"code":3050003,"name":"eosio_assert_message_exception","what":"eosio_assert_message assertion failure","details":[]}}
     });
   }

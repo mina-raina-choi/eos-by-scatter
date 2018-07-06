@@ -28,7 +28,7 @@
 
   </div>
   <div class="ui segment">
-    <h2 class="ui header">EOS 송금</h2>
+    <h2 class="ui header">EOS 송금 (미완성)</h2>
     <form [formGroup]="transferForm" (ngSubmit)="transfer(transferForm.value)" class="ui form" [class.error]="!transferForm.valid && transferForm.touched">
       <div class="ui input">
         <input type="text" id="toAccount" placeholder="받는 계정" [formControl]="transferForm.controls['toAccount']">
