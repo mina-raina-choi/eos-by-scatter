@@ -11,6 +11,7 @@ export class ScatterService {
 
     load() {
         this.scatter = (<any>window).scatter;
+        console.log(this.scatter)
         // eosmetal에서 제공하는 이오스 네트워크 => 우리 EOS 노드 네트워크 정보로 바꿔야겠지? 아니면 eosmetal을 사용?
         this.network = {
             blockchain: 'eos',

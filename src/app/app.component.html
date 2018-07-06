@@ -7,12 +7,19 @@
 </div>
 
 <div class="ui main container eight wide column">
-    <button class="ui button" (click)="login()">Login By Scatter</button>
-    <button class="ui button" (click)="logout()">Logout By Scatter</button>
-    <div class="ui segment">
-      <p>EOS Account Name : {{eosAccountName}}</p>
-      <p>EOS Authority : {{eosAuthority}}</p>
-      <p>hash : {{eosHash}}</p>
-      <p>EOS Public Key : {{eosPubKey}}</p>
-    </div>
+  <div class="ui" *ngIf="!noScatter">
+    <div class="ui error message">
+      Scatter is not installed. Refresh page after installing.</div>
+    <button class="ui button"><a href="https://get-scatter.com/" target="_blank">Download Scatter</a></button>
+  </div>
+
+  <div class="ui segment">
+    <button class="ui button" [class.disabled]="!noScatter" (click)="login()">Login By Scatter</button>
+    <button class="ui button" [class.disabled]="!noScatter" (click)="logout()">Logout By Scatter</button>
+    <div class="ui divider"></div>
+    <p>EOS Account Name : {{eosAccountName}}</p>
+    <p>EOS Authority : {{eosAuthority}}</p>
+    <p>hash : {{eosHash}}</p>
+    <p>EOS Public Key : {{eosPubKey}}</p>
+  </div>
 </div>
