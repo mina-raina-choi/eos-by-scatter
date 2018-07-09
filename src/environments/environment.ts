@@ -6,7 +6,8 @@
 export const environment = {
   production: false,
   apiUrl: '//localhost',
-  eosHost: 'api.eosmetal.io',
-  eosPort: 18890,
+  eosHost: 'api.eosnewyork.io',
+  eosPort: 443,
   eosProtocol: 'https',
 };
+// https://api.eosnewyork.io:443

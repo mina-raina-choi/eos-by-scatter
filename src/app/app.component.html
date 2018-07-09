@@ -1,7 +1,7 @@
 <div class="ui menu">
   <div class="ui container">
     <div class="header item borderless">
-      <h1 class="ui header">EOS Login By Scatter</h1>
+      <h1 class="ui header">EOS transaction By Scatter</h1>
     </div>
   </div>
 </div>
@@ -10,31 +10,31 @@
   <div class="ui" *ngIf="!noScatter">
     <div class="ui error message">
       Scatter is not installed. Refresh page after installing.</div>
-    <button class="ui button">
+    <button class="ui button black">
       <a href="https://get-scatter.com/" target="_blank">Download Scatter</a>
     </button>
   </div>
 
   <div class="ui segment">
-    <button class="ui button" [class.disabled]="!noScatter" (click)="login()">Login By Scatter</button>
-    <button class="ui button" [class.disabled]="!noScatter" (click)="logout()">Logout By Scatter</button>
+    <button class="ui button black" [class.disabled]="!noScatter" (click)="login()">Login By Scatter</button>
+    <button class="ui button black" [class.disabled]="!noScatter" (click)="logout()">Logout By Scatter</button>
     <div class="ui divider"></div>
-    <p>EOS Account Name : <b>{{eosAccountName}}</b></p>
+    <p>EOS Account Name :
+      <b>{{eosAccountName}}</b>
+    </p>
     <p>EOS Authority : {{eosAuthority}}</p>
     <p>hash : {{eosHash}}</p>
     <p>EOS Public Key : {{eosPubKey}}</p>
-    <!-- <div class="ui divider"></div> -->
-    <!-- <button class="ui button" [class.disabled]="!noScatter" (click)="getInfo()">Get Info</button> -->
 
   </div>
   <div class="ui segment">
-    <h2 class="ui header">EOS 송금 (미완성)</h2>
+    <h2 class="ui header">EOS 송금</h2>
     <form [formGroup]="transferForm" (ngSubmit)="transfer(transferForm.value)" class="ui form" [class.error]="!transferForm.valid && transferForm.touched">
       <div class="ui input">
         <input type="text" id="toAccount" placeholder="받는 계정" [formControl]="transferForm.controls['toAccount']">
       </div>
       <div class="ui input">
-        <input type="text" id="toAmount" placeholder="보낼 수량" [formControl]="transferForm.controls['toAmount']">
+        <input type="text" id="toAmount" placeholder="보낼 수량(소수점 4자리까지만 가능)" [formControl]="transferForm.controls['toAmount']">
       </div>
       <div class="ui input">
         <input type="text" id="toMemo" placeholder="메모" [formControl]="transferForm.controls['toMemo']">
@@ -42,7 +42,24 @@
       <div *ngIf="transferForm.controls['toAccount'].hasError('required')" class="ui error message">Account is required</div>
       <div *ngIf="transferForm.controls['toAmount'].hasError('required')" class="ui error message">Amount is required</div>
       <div class="ui divider"></div>
-      <button class="ui button" type="submit" [class.disabled]="!transferForm.valid">Transfer</button>
+      <button class="ui button black" type="submit" [class.disabled]="!transferForm.valid">Transfer</button>
     </form>
+    
+    <div class="ui active inverted dimmer"  *ngIf="isTranferring">
+      <div class="ui text loader">Loading</div>
+    </div>
+    
+    <div *ngIf="errorMsg != ''" class="ui error message">
+      <div class="header">
+        Transfer failed.
+      </div>
+      <p>{{errorMsg}}</p>
+    </div>
+    <div *ngIf="successTransfer != ''" class="ui message success">
+      <div class="header">
+        Transfer success.
+      </div>
+      <p>{{successTransfer}}</p>
+    </div>
   </div>
 </div>

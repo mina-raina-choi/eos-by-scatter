@@ -1,6 +1,8 @@
 import { Component, Renderer2, OnInit } from '@angular/core';
 import { ScatterService } from './services/scatter.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import * as $ from 'jquery';
+import { Decimal } from 'decimal.js';
 
 @Component({
   selector: 'app-root',
@@ -16,6 +18,9 @@ export class AppComponent implements OnInit {
   eosAuthority: string;
 
   transferForm: FormGroup;
+  errorMsg: string = '';
+  successTransfer: string = '';
+  isTranferring: boolean = false;
 
   constructor(private scatterService: ScatterService, private renderer: Renderer2, fb: FormBuilder) {
     renderer.listen('document', 'scatterLoaded', () => {
@@ -58,26 +63,54 @@ export class AppComponent implements OnInit {
   }
 
   transfer(value) {
-    this.scatterService.transfer(value.toAccount, value.toAmount, value.toMemo ).then(transaction => {
+    this.errorMsg = '';
+    this.successTransfer = ''
+    value.toAmount = this.set4Decimal(value.toAmount)
+
+    this.isTranferring = true;
+
+    this.scatterService.transfer(value.toAccount, value.toAmount, value.toMemo).then(transaction => {
       console.log("transfer", transaction)
+      // {broadcast: true, transaction: {…}, transaction_id: "27c2e478f5fea7309042ec230c3529ceefd5bcd4adb4dad96bedcd83c623922f", processed: {…}, returnedFields: {…}}
+      this.successTransfer = transaction.transaction_id
+      this.isTranferring = false
     }, error => {
       console.log("transfer error", error)
+      this.errorMsg = JSON.parse(error).error.what
+      this.isTranferring = false
+
       // chainId mismatch error ==> https://github.com/EOSEssentials/Scatter/issues/87
       // {"code":500,"message":"Internal Service Error","error":{"code":3090003,"name":"unsatisfied_authorization","what":"provided keys, permissions, and delays do not satisfy declared authorizations","details":[]}
-      
+
       // deny 했을 경우
       // {type: "signature_rejected", message: "User rejected the signature request", code: 402, isError: true}
-      
-      // https://github.com/EOSIO/eos/issues/4001
+
+      // 수량을 1.0000 소수점 4자리까지 맞추지 않았을 때,
       // transfer error {"code":500,"message":"Internal Service Error","error":{"code":3050003,"name":"eosio_assert_message_exception","what":"eosio_assert_message assertion failure","details":[]}}
+
+      // eosmetal.io로 post요청 보냈을 때, 아래 에러나서 eosnewyork으로 변경
+      //  {"code":400,"message":"Bad Request","error":{"code":3040005,"name":"expired_tx_exception","what":"Expired Transaction","details":[]}}
     });
   }
 
   getInfo() {
-    this.scatterService.getInfo().then((res)=> {
+    this.scatterService.getInfo().then((res) => {
       console.log("getInfo", res)
     }, error => {
       console.log("getInfo error", error)
     })
+  }
+
+  set4Decimal(value) {
+    return new Decimal(value).mul(Math.pow(10, 4)).floor().div(Math.pow(10, 4)).toFixed(4)
+  }
+
+  DOMNodeInserted() {
+    this.isTranferring = true;
+    $(document).on("DOMNodeInserted", function (e) {
+      this.isTranferring = false;
+      var target = $(e.target);
+      console.log("DOMNodeInserted", e)
+    });
   }
 }
