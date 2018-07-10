@@ -11,7 +11,7 @@ export class EosService {
     transfer(fromAccount, toAccount, toAmount, toMemo, privateKey) {
         try {
             const config = {
-                // chainId: 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906',
+                chainId: 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906',
                 keyProvider: [privateKey],
                 httpEndpoint: 'https://api.eosnewyork.io:443',
                 expireInSeconds: 60,
