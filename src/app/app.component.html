@@ -1,7 +1,7 @@
 <div class="ui menu">
   <div class="ui container">
     <div class="header item borderless">
-      <h1 class="ui header">EOS transaction By Scatter</h1>
+      <h1 class="ui header">EOS transaction</h1>
     </div>
   </div>
 </div>
@@ -15,9 +15,11 @@
     </button>
   </div>
 
+
   <div class="ui segment">
-    <button class="ui button black" [class.disabled]="!noScatter" (click)="login()">Login By Scatter</button>
-    <button class="ui button black" [class.disabled]="!noScatter" (click)="logout()">Logout By Scatter</button>
+    <h2 class="ui header">Login by Scatter</h2>
+    <button class="ui button black" [class.disabled]="!noScatter" (click)="login()">Login</button>
+    <button class="ui button black" [class.disabled]="!noScatter" (click)="logout()">Logout</button>
     <div class="ui divider"></div>
     <p>EOS Account Name :
       <b>{{eosAccountName}}</b>
@@ -28,27 +30,29 @@
 
   </div>
   <div class="ui segment">
-    <h2 class="ui header">EOS 송금</h2>
+    <h2 class="ui header">EOS 송금 by Scatter</h2>
     <form [formGroup]="transferForm" (ngSubmit)="transfer(transferForm.value)" class="ui form" [class.error]="!transferForm.valid && transferForm.touched">
-      <div class="ui input">
-        <input type="text" id="toAccount" placeholder="받는 계정" [formControl]="transferForm.controls['toAccount']">
-      </div>
-      <div class="ui input">
-        <input type="text" id="toAmount" placeholder="보낼 수량(소수점 4자리까지만 가능)" [formControl]="transferForm.controls['toAmount']">
-      </div>
-      <div class="ui input">
-        <input type="text" id="toMemo" placeholder="메모" [formControl]="transferForm.controls['toMemo']">
+      <div class="ui grid">
+        <div class="ui input eight wide column">
+          <input type="text" id="toAccount" placeholder="받는 계정" [formControl]="transferForm.controls['toAccount']">
+        </div>
+        <div class="ui input eight wide column">
+          <input type="text" id="toAmount" placeholder="보낼 수량(소수점 4자리까지만 가능)" [formControl]="transferForm.controls['toAmount']">
+        </div>
+        <div class="ui input eight wide column">
+          <input type="text" id="toMemo" placeholder="메모" [formControl]="transferForm.controls['toMemo']">
+        </div>
       </div>
       <div *ngIf="transferForm.controls['toAccount'].hasError('required')" class="ui error message">Account is required</div>
       <div *ngIf="transferForm.controls['toAmount'].hasError('required')" class="ui error message">Amount is required</div>
       <div class="ui divider"></div>
       <button class="ui button black" type="submit" [class.disabled]="!transferForm.valid">Transfer</button>
     </form>
-    
-    <div class="ui active inverted dimmer"  *ngIf="isTranferring">
+
+    <div class="ui active inverted dimmer" *ngIf="isTranferring">
       <div class="ui text loader">Loading</div>
     </div>
-    
+
     <div *ngIf="errorMsg != ''" class="ui error message">
       <div class="header">
         Transfer failed.
@@ -62,4 +66,52 @@
       <p>{{successTransfer}}</p>
     </div>
   </div>
+
+
+  <div class="ui segment">
+    <h2 class="ui header">EOS 송금 by eosjs</h2>
+    <form [formGroup]="formByEosjs" (ngSubmit)="transferByEosjs(formByEosjs.value)" class="ui form" [class.error]="!formByEosjs.valid && formByEosjs.touched">
+      <div class="ui grid">
+        <div class="ui input ten wide column">
+          <input type="text" id="fromAccount" placeholder="내 계정" [formControl]="formByEosjs.controls['fromAccount']" [(ngModel)]="eosAccountName">
+        </div>
+        <div class="ui input ten wide column">
+          <input type="password" id="privateKey" placeholder="private key" [formControl]="formByEosjs.controls['privateKey']">
+        </div>
+        <div class="ui input ten wide column">
+          <input type="text" placeholder="받는 계정" [formControl]="formByEosjs.controls['toAccount']">
+        </div>
+        <div class="ui input ten wide column">
+          <input type="text" placeholder="보낼 수량(소수점 4자리까지만 가능)" [formControl]="formByEosjs.controls['toAmount']">
+        </div>
+        <div class="ui input ten wide column">
+          <input type="text" placeholder="메모" [formControl]="formByEosjs.controls['toMemo']">
+        </div>
+      </div>
+
+      <div *ngIf="formByEosjs.controls['fromAccount'].hasError('required')" class="ui error message">FromAccount is required</div>
+      <div *ngIf="formByEosjs.controls['privateKey'].hasError('required')" class="ui error message">Private Key is required</div>
+      <div *ngIf="formByEosjs.controls['toAccount'].hasError('required')" class="ui error message">ToAccount is required</div>
+      <div *ngIf="formByEosjs.controls['toAmount'].hasError('required')" class="ui error message">Amount is required</div>
+      <div class="ui divider"></div>
+      <button class="ui button black" type="submit" [class.disabled]="!formByEosjs.valid">Transfer</button>
+    </form>
+    <div class="ui active inverted dimmer" *ngIf="isTranferring2">
+      <div class="ui text loader">Loading</div>
+    </div>
+
+    <div *ngIf="errorMsg2 != ''" class="ui error message">
+      <div class="header">
+        Transfer failed.
+      </div>
+      <p>{{errorMsg2}}</p>
+    </div>
+    <div *ngIf="successTransfer2 != ''" class="ui message success">
+      <div class="header">
+        Transfer success.
+      </div>
+      <p>{{successTransfer2}}</p>
+    </div>
+  </div>
+  <div class="divider ui"></div>
 </div>

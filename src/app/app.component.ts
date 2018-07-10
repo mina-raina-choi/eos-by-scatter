@@ -1,8 +1,8 @@
 import { Component, Renderer2, OnInit } from '@angular/core';
 import { ScatterService } from './services/scatter.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import * as $ from 'jquery';
 import { Decimal } from 'decimal.js';
+import { EosService } from './services/eos.service';
 
 @Component({
   selector: 'app-root',
@@ -22,7 +22,12 @@ export class AppComponent implements OnInit {
   successTransfer: string = '';
   isTranferring: boolean = false;
 
-  constructor(private scatterService: ScatterService, private renderer: Renderer2, fb: FormBuilder) {
+  formByEosjs: FormGroup;
+  errorMsg2: string = '';
+  successTransfer2: string = '';
+  isTranferring2: boolean = false;
+
+  constructor(private scatterService: ScatterService, private renderer: Renderer2, fb: FormBuilder, private eosService: EosService) {
     renderer.listen('document', 'scatterLoaded', () => {
       this.scatterService.load();
       this.noScatter = true
@@ -33,10 +38,21 @@ export class AppComponent implements OnInit {
       'toAmount': ['', Validators.required],
       'toMemo': ['']
     })
+
+    this.formByEosjs = fb.group({
+      'fromAccount': ['', Validators.required],
+      'privateKey': [''],
+      'toAccount': ['', Validators.required],
+      'toAmount': ['', Validators.required],
+      'toMemo': ['']
+    })
   }
 
   ngOnInit() {
   }
+
+
+  // sscatter 관련
 
   login() {
     this.scatterService.login().then((identity) => {
@@ -62,24 +78,26 @@ export class AppComponent implements OnInit {
     this.eosAuthority = "";
   }
 
-  transfer(value) {
+  async transfer(value) {
     this.errorMsg = '';
     this.successTransfer = ''
     value.toAmount = this.set4Decimal(value.toAmount)
 
     this.isTranferring = true;
 
-    this.scatterService.transfer(value.toAccount, value.toAmount, value.toMemo).then(transaction => {
+    try {
+      const transaction = await this.scatterService.transfer(value.toAccount, value.toAmount, value.toMemo)
       console.log("transfer", transaction)
       // {broadcast: true, transaction: {…}, transaction_id: "27c2e478f5fea7309042ec230c3529ceefd5bcd4adb4dad96bedcd83c623922f", processed: {…}, returnedFields: {…}}
       this.successTransfer = transaction.transaction_id
       this.isTranferring = false
-    }, error => {
+      this.transferForm.reset();
+    } catch (error) {
       console.log("transfer error", error)
       this.errorMsg = JSON.parse(error).error.what
       this.isTranferring = false
-
       // chainId mismatch error ==> https://github.com/EOSEssentials/Scatter/issues/87
+      // pass chainId into the options parameter of scatter.eos(...,{chainId})
       // {"code":500,"message":"Internal Service Error","error":{"code":3090003,"name":"unsatisfied_authorization","what":"provided keys, permissions, and delays do not satisfy declared authorizations","details":[]}
 
       // deny 했을 경우
@@ -90,27 +108,25 @@ export class AppComponent implements OnInit {
 
       // eosmetal.io로 post요청 보냈을 때, 아래 에러나서 eosnewyork으로 변경
       //  {"code":400,"message":"Bad Request","error":{"code":3040005,"name":"expired_tx_exception","what":"Expired Transaction","details":[]}}
-    });
-  }
-
-  getInfo() {
-    this.scatterService.getInfo().then((res) => {
-      console.log("getInfo", res)
-    }, error => {
-      console.log("getInfo error", error)
-    })
+    }
   }
 
   set4Decimal(value) {
     return new Decimal(value).mul(Math.pow(10, 4)).floor().div(Math.pow(10, 4)).toFixed(4)
   }
 
-  DOMNodeInserted() {
-    this.isTranferring = true;
-    $(document).on("DOMNodeInserted", function (e) {
-      this.isTranferring = false;
-      var target = $(e.target);
-      console.log("DOMNodeInserted", e)
-    });
+  async transferByEosjs(value) {
+    this.isTranferring2 = true;
+    try {
+      const res: any = await this.eosService.transfer(value.fromAccount, value.toAccount, value.toAmount, value.toMemo, value.privateKey)
+      console.log("transferByEosjs", res)
+      this.successTransfer2 = res.transaction_id
+      this.isTranferring2 = false
+      this.formByEosjs.reset()
+    } catch (error) {
+      console.log("transferByEosjs error", error)
+      this.errorMsg2 = error.toString()
+      this.isTranferring2 = false
+    }
   }
 }

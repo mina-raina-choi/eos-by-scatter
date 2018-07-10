@@ -5,6 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
 import { ScatterService } from './services/scatter.service';
+import { EosService } from './services/eos.service';
 
 
 @NgModule({
@@ -17,7 +18,8 @@ import { ScatterService } from './services/scatter.service';
     ReactiveFormsModule
   ],
   providers: [
-    ScatterService
+    ScatterService,
+    EosService
   ],
   bootstrap: [AppComponent]
 })
