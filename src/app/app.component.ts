@@ -86,6 +86,7 @@ export class AppComponent implements OnInit {
     this.eosPubKey = "";
     this.eosAccountName = "";
     this.eosAuthority = "";
+    this.eosBalance = "";
   }
 
   async transfer(value) {
