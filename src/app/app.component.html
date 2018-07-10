@@ -21,12 +21,18 @@
     <button class="ui button black" [class.disabled]="!noScatter" (click)="login()">Login</button>
     <button class="ui button black" [class.disabled]="!noScatter" (click)="logout()">Logout</button>
     <div class="ui divider"></div>
-    <p>EOS Account Name :
+    <h3>
+      <strong>EOS Account Name : </strong>
       <b>{{eosAccountName}}</b>
-    </p>
-    <p>EOS Authority : {{eosAuthority}}</p>
-    <p>hash : {{eosHash}}</p>
-    <p>EOS Public Key : {{eosPubKey}}</p>
+    </h3>
+    <h3>
+      <strong>EOS Balance : </strong>{{eosBalance}}</h3>
+    <h5>
+      <strong>EOS Authority : </strong>{{eosAuthority}}</h5>
+    <h5>
+      <strong>hash : </strong>{{eosHash}}</h5>
+    <h5>
+      <strong>EOS Public Key : </strong>{{eosPubKey}}</h5>
 
   </div>
   <div class="ui segment">
@@ -36,7 +42,7 @@
         <div class="ui input eight wide column">
           <input type="text" id="toAccount" placeholder="받는 계정" [formControl]="transferForm.controls['toAccount']">
         </div>
-        <p class = "eight wide column">ex) eos2minachoi</p>
+        <p class="eight wide column">ex) eos2minachoi</p>
         <div class="ui input eight wide column">
           <input type="text" id="toAmount" placeholder="보낼 수량(소수점 4자리까지만 가능)" [formControl]="transferForm.controls['toAmount']">
         </div>
@@ -82,7 +88,7 @@
         <div class="ui input ten wide column">
           <input type="text" placeholder="받는 계정" [formControl]="formByEosjs.controls['toAccount']">
         </div>
-        <p class = "six wide column">ex) eos2minachoi</p>
+        <p class="six wide column">ex) eos2minachoi</p>
         <div class="ui input ten wide column">
           <input type="text" placeholder="보낼 수량(소수점 4자리까지만 가능)" [formControl]="formByEosjs.controls['toAmount']">
         </div>
@@ -115,5 +121,16 @@
       <p>{{successTransfer2}}</p>
     </div>
   </div>
-  <div class="divider ui"></div>
+
+  <div class="ui segment">
+    <h2 class="ui header">EOS balance by AcccontName</h2>
+    <form [formGroup]="formBalance" (ngSubmit)="getBalanceBySearching(formBalance.value.accountName)">
+      <div class="ui input">
+        <input type="text" id="accountName" placeholder="계정이름" [formControl]="formBalance.controls['accountName']">
+      </div>
+      <button class="ui button black" type="submit"  [class.disabled]="!formBalance.valid">Get Balance</button>
+    </form>
+    <div class="ui divider"></div>
+    <h3 class="ui">{{balanceBySearching}}</h3>
+  </div>
 </div>

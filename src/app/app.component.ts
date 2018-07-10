@@ -16,6 +16,7 @@ export class AppComponent implements OnInit {
   eosPubKey: string;
   eosAccountName: string;
   eosAuthority: string;
+  eosBalance: string;
 
   transferForm: FormGroup;
   errorMsg: string = '';
@@ -26,6 +27,9 @@ export class AppComponent implements OnInit {
   errorMsg2: string = '';
   successTransfer2: string = '';
   isTranferring2: boolean = false;
+
+  formBalance: FormGroup;
+  balanceBySearching: string;
 
   constructor(private scatterService: ScatterService, private renderer: Renderer2, fb: FormBuilder, private eosService: EosService) {
     renderer.listen('document', 'scatterLoaded', () => {
@@ -41,10 +45,14 @@ export class AppComponent implements OnInit {
 
     this.formByEosjs = fb.group({
       'fromAccount': ['', Validators.required],
-      'privateKey': [''],
+      'privateKey': ['', Validators.required],
       'toAccount': ['', Validators.required],
       'toAmount': ['', Validators.required],
       'toMemo': ['']
+    })
+
+    this.formBalance = fb.group({
+      'accountName': ['', Validators.required]
     })
   }
 
@@ -63,6 +71,8 @@ export class AppComponent implements OnInit {
       this.eosAuthority = identity.accounts[0].authority;
       this.eosHash = identity.hash;
       this.eosPubKey = identity.publicKey;
+      this.getBalance(this.eosAccountName)
+
     }, error => {
       console.log("failed", error)
       // scatter에 연결된 계정이 없을 때
@@ -129,4 +139,13 @@ export class AppComponent implements OnInit {
       this.isTranferring2 = false
     }
   }
+
+  async getBalance(account) {
+    this.eosBalance = await this.eosService.getBalance(account)
+  }
+
+  async getBalanceBySearching(account) {
+    this.balanceBySearching = await this.eosService.getBalance(account)
+  }
+
 }
