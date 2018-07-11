@@ -15,7 +15,6 @@
     </button>
   </div>
 
-
   <div class="ui segment">
     <h2 class="ui header">Login by Scatter</h2>
     <button class="ui button black" [class.disabled]="!noScatter" (click)="login()">Login</button>
@@ -31,9 +30,24 @@
       <h5>Unstaked : {{accountInfoByScatter.core_liquid_balance}} EOS</h5>
       <h5>Staked : {{accountInfoByScatter.staked}} EOS</h5>
       <h5>Refund : {{accountInfoByScatter.refund}} EOS</h5>
-      <h5>Memory : {{accountInfoByScatter.ram_usage}} / {{accountInfoByScatter.ram_quota}}</h5>
-      <h5>CPU : {{accountInfoByScatter.cpu_limit.used}} / {{accountInfoByScatter.cpu_limit.max}} ({{accountInfoByScatter.total_resources.cpu_weight}})</h5>
-      <h5>Bandwidth : {{accountInfoByScatter.net_limit.used}} / {{accountInfoByScatter.net_limit.max}} ({{accountInfoByScatter.total_resources.net_weight}})</h5>
+      <div class="ui progress yellow">
+        <div class="bar">
+          <div class="progress" data-value="90" data-total="200"></div>
+        </div>
+        <div class="label">Memory {{accountInfoByScatter.ram_usage}} / {{accountInfoByScatter.ram_quota}}</div>
+      </div>
+      <div class="ui progress green  ">
+        <div class="bar">
+          <div class="progress"></div>
+        </div>
+        <div class="label">CPU {{accountInfoByScatter.cpu_limit.used}} / {{accountInfoByScatter.cpu_limit.max}} ({{accountInfoByScatter.total_resources.cpu_weight}})</div>
+      </div>
+      <div class="ui progress teal  ">
+        <div class="bar">
+          <div class="progress"></div>
+        </div>
+        <div class="label">Bandwidth {{accountInfoByScatter.net_limit.used}} / {{accountInfoByScatter.net_limit.max}} ({{accountInfoByScatter.total_resources.net_weight}})</div>
+      </div>
     </div>
 
   </div>
@@ -81,20 +95,20 @@
     <h2 class="ui header">EOS 송금 by eosjs</h2>
     <form [formGroup]="formByEosjs" (ngSubmit)="transferByEosjs(formByEosjs.value)" class="ui form" [class.error]="!formByEosjs.valid && formByEosjs.touched">
       <div class="ui grid">
-        <div class="ui input ten wide column">
+        <div class="ui input twelve wide column">
           <input type="text" id="fromAccount" placeholder="내 계정" [formControl]="formByEosjs.controls['fromAccount']" [(ngModel)]="eosAccountName">
         </div>
-        <div class="ui input ten wide column">
+        <div class="ui input twelve wide column">
           <input type="password" id="privateKey" placeholder="private key" [formControl]="formByEosjs.controls['privateKey']">
         </div>
-        <div class="ui input ten wide column">
+        <div class="ui input twelve wide column">
           <input type="text" placeholder="받는 계정" [formControl]="formByEosjs.controls['toAccount']">
         </div>
         <p class="six wide column">ex) eos2minachoi</p>
-        <div class="ui input ten wide column">
+        <div class="ui input twelve wide column">
           <input type="text" placeholder="보낼 수량(소수점 4자리까지만 가능)" [formControl]="formByEosjs.controls['toAmount']">
         </div>
-        <div class="ui input ten wide column">
+        <div class="ui input twelve wide column">
           <input type="text" placeholder="메모" [formControl]="formByEosjs.controls['toMemo']">
         </div>
       </div>
@@ -130,7 +144,7 @@
       <div class="ui input">
         <input type="text" id="accountName" placeholder="계정이름" [formControl]="formBalance.controls['accountName']">
       </div>
-      <button class="ui button black" type="submit"  [class.disabled]="!formBalance.valid">Get Balance</button>
+      <button class="ui button black" type="submit" [class.disabled]="!formBalance.valid">Get Balance</button>
     </form>
     <div class="ui divider"></div>
     <h3 class="ui">{{balanceBySearching}}</h3>
@@ -143,7 +157,7 @@
       <div class="ui input">
         <input type="text" placeholder="계정이름" [formControl]="formAccountInfo.controls['accountName']">
       </div>
-      <button class="ui button black" type="submit"  [class.disabled]="!formAccountInfo.valid">Get Account Info</button>
+      <button class="ui button black" type="submit" [class.disabled]="!formAccountInfo.valid">Get Account Info</button>
     </form>
     <div class="ui divider"></div>
     <div class="ui" *ngIf="accountInfo">
@@ -155,6 +169,62 @@
       <h5>Memory : {{accountInfo.ram_usage}} byte / {{accountInfo.ram_quota}} byte</h5>
       <h5>CPU : {{accountInfo.cpu_limit.used}} / {{accountInfo.cpu_limit.max}} ({{accountInfo.total_resources.cpu_weight}})</h5>
       <h5>Bandwidth : {{accountInfo.net_limit.used}} byte / {{accountInfo.net_limit.max}} byte ({{accountInfo.total_resources.net_weight}})</h5>
+    </div>
+  </div>
+
+  <div class="ui segment">
+    <h2 class="ui header">Create New EOS Account (미완성)</h2>
+    <form class="ui form" [formGroup]="formNewaccount" (ngSubmit)="createNewAccount(formNewaccount.value)"  [class.error]="!formNewaccount.valid && formNewaccount.touched">
+      <div class="ui grid">
+        <div class="ui input twelve wide column">
+          <input type="text" placeholder="계정이름" [formControl]="formNewaccount.controls['name']">
+        </div>
+        <div class="ui input twelve wide column">
+          <input type="text" placeholder="creator" [formControl]="formNewaccount.controls['creator']">
+        </div>
+        <div class="ui input twelve wide column">
+          <input type="text" placeholder="public key" [formControl]="formNewaccount.controls['pubkey']">
+        </div>
+        <div class="ui input twelve wide column">
+          <input type="password" placeholder="private key" [formControl]="formNewaccount.controls['privatekey']">
+        </div>
+        <div class="ui input twelve wide column">
+          <input type="text" placeholder="ram" [formControl]="formNewaccount.controls['ram']">
+        </div>
+        <div class="ui input twelve wide column">
+          <input type="text" placeholder="stake_net_quantity" [formControl]="formNewaccount.controls['stake_net_quantity']">
+        </div>
+        <div class="ui input twelve wide column">
+          <input type="text" placeholder="stake_cpu_quantity" [formControl]="formNewaccount.controls['stake_cpu_quantity']">
+        </div>
+      </div>
+      <div *ngIf="formNewaccount.controls['name'].hasError('required')" class="ui error message">name is required</div>
+      <div *ngIf="formNewaccount.controls['creator'].hasError('required')" class="ui error message">creator is required</div>
+      <div *ngIf="formNewaccount.controls['pubkey'].hasError('required')" class="ui error message">public key is required</div>
+      <div *ngIf="formNewaccount.controls['privatekey'].hasError('required')" class="ui error message">private key is required</div>
+      <div *ngIf="formNewaccount.controls['pubkey'].hasError('invalidPubkey')" class="ui error message">invalidPubkey</div>
+      <div *ngIf="formNewaccount.controls['privatekey'].hasError('invalidPrivatekey')" class="ui error message">invalidPrivatekey</div>
+      <div *ngIf="formNewaccount.controls['ram'].hasError('required')" class="ui error message">ram is required</div>
+      <div *ngIf="formNewaccount.controls['stake_net_quantity'].hasError('required')" class="ui error message">stake_net_quantity is required</div>
+      <div *ngIf="formNewaccount.controls['stake_cpu_quantity'].hasError('required')" class="ui error message">stake_cpu_quantity is required</div>
+      <div class="ui divider"></div>
+      <button class="button ui black" type="submit" [class.disabled]="!formNewaccount.valid">Create New Account</button>
+    </form>
+    <div class="ui active inverted dimmer" *ngIf="isCreating">
+      <div class="ui text loader">Loading</div>
+    </div>
+
+    <div *ngIf="errNewaccount != ''" class="ui error message">
+      <div class="header">
+        Failed to Creating new EOS Account.
+      </div>
+      <p>{{errNewaccount}}</p>
+    </div>
+    <div *ngIf="successNewaccount != ''" class="ui message success">
+      <div class="header">
+        Create new EOS Account.
+      </div>
+      <p>{{successNewaccount}}</p>
     </div>
   </div>
 </div>

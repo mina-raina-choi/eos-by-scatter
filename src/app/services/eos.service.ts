@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
 import * as Eos from 'eosjs';
+import Decimal from "decimal.js";
 
 @Injectable()
 export class EosService {
@@ -34,9 +35,6 @@ export class EosService {
             }
 
             this.connectNode(config)
-
-            // this.eos = Eos(config)
-            // console.log("this.eos", this.eos, )
             const DecimalPad = Eos.modules.format.DecimalPad
             const precision = 4
             console.log("eos.service", fromAccount, toAccount, DecimalPad(toAmount, precision) + ' EOS', toMemo)
@@ -93,5 +91,48 @@ export class EosService {
             // this.eos.getCurrencyBalance({ code: 'EOS', symbol: 'EOS', account: myaccount })
             // {"code":500,"message":"Internal Service Error","error":{"code":3010001,"name":"name_type_exception","what":"Invalid name","details":[]}}
         }
+    }
+
+    createNewAccount(name, creator, pubKey, privateKey, ram, stake_net_quantity, stake_cpu_quantity) {
+        const pubkey = pubKey
+        const config = {
+            chainId: 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906',
+            keyProvider: [privateKey],
+            httpEndpoint: 'https://api.eosnewyork.io:443',
+            expireInSeconds: 60,
+            broadcast: true,
+            verbose: false, // API activity
+            sign: true
+        }
+
+        this.connectNode(config)
+
+        const DecimalPad = Eos.modules.format.DecimalPad
+        const precision = 4
+        const ram_bytes = new Decimal(ram).mul(1024).toNumber()
+
+        console.log("createNewAccount", name, creator, pubKey, privateKey, ram_bytes, DecimalPad(stake_net_quantity, precision), DecimalPad(stake_cpu_quantity, precision))
+        return this.eos.transaction(tr => {
+            tr.newaccount({
+                creator: creator,
+                name: name,
+                owner: pubkey,
+                active: pubkey
+            })
+
+            tr.buyrambytes({
+                payer: creator,
+                receiver: name,
+                bytes: ram_bytes
+            })
+
+            tr.delegatebw({
+                from: creator,
+                receiver: name,
+                stake_net_quantity: DecimalPad(stake_net_quantity, precision) + ' EOS',
+                stake_cpu_quantity: DecimalPad(stake_cpu_quantity, precision) + ' EOS',
+                transfer: 0
+            })
+        })
     }
 }

@@ -1,8 +1,17 @@
 import { Component, Renderer2, OnInit } from '@angular/core';
 import { ScatterService } from './services/scatter.service';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { Decimal } from 'decimal.js';
 import { EosService } from './services/eos.service';
+import * as ecc from 'eosjs-ecc';
+
+function pubkeyValidator(control: FormControl): { [s: string]: boolean }  {
+  return  { invalidPubkey : !ecc.isValidPublic(control.value)} 
+}
+
+function privatekeyValidator(control: FormControl): { [s: string]: boolean }  {
+  return  { invalidPrivatekey : !ecc.isValidPrivate(control.value)} 
+}
 
 @Component({
   selector: 'app-root',
@@ -34,6 +43,11 @@ export class AppComponent implements OnInit {
   formAccountInfo: FormGroup;
   accountInfo: any;
 
+  formNewaccount: FormGroup;
+  isCreating: boolean = false;
+  errNewaccount: string = '';
+  successNewaccount: string = '';
+
   constructor(private scatterService: ScatterService, private renderer: Renderer2, fb: FormBuilder, private eosService: EosService) {
     renderer.listen('document', 'scatterLoaded', () => {
       this.scatterService.load();
@@ -48,7 +62,7 @@ export class AppComponent implements OnInit {
 
     this.formByEosjs = fb.group({
       'fromAccount': ['', Validators.required],
-      'privateKey': ['', Validators.required],
+      'privateKey': ['', Validators.required, privatekeyValidator],
       'toAccount': ['', Validators.required],
       'toAmount': ['', Validators.required],
       'toMemo': ['']
@@ -61,9 +75,22 @@ export class AppComponent implements OnInit {
     this.formAccountInfo = fb.group({
       'accountName': ['', Validators.required]
     })
+
+    this.formNewaccount = fb.group({
+      'name': ['', Validators.required],
+      'creator': ['', Validators.required],
+      'pubkey': ['', 
+        Validators.compose([Validators.required, pubkeyValidator])],
+      'privatekey': ['', 
+        Validators.compose([Validators.required, privatekeyValidator])],
+      'ram': ['', Validators.required],
+      'stake_net_quantity': ['', Validators.required],
+      'stake_cpu_quantity': ['', Validators.required],
+    })
   }
 
   ngOnInit() {
+    console.log("ecc", ecc)
   }
 
 
@@ -78,9 +105,7 @@ export class AppComponent implements OnInit {
       this.eosAuthority = identity.accounts[0].authority;
       this.eosHash = identity.hash;
       this.eosPubKey = identity.publicKey;
-      // this.getBalance(this.eosAccountName)
       this.getAccountInfo(this.eosAccountName, 2)
-
     }, error => {
       console.log("failed", error)
       // scatter에 연결된 계정이 없을 때
@@ -165,24 +190,39 @@ export class AppComponent implements OnInit {
       res.total_balance = res.core_liquid_balance
       res.staked = 0;
       res.refund = 0;
-      if(res.voter_info) {
-        if(res.voter_info.staked) {
-          res.total_balance =  new Decimal(res.voter_info.staked).div(Math.pow(10, 4)).add(res.core_liquid_balance)
+      if (res.voter_info) {
+        if (res.voter_info.staked) {
+          res.total_balance = new Decimal(res.voter_info.staked).div(Math.pow(10, 4)).add(res.core_liquid_balance)
           res.staked = new Decimal(res.voter_info.staked).div(Math.pow(10, 4))
         }
-  
-        if(res.voter_info.refund)
+
+        if (res.voter_info.refund)
           res.refund = new Decimal(res.voter_info.refund).div(Math.pow(10, 4))
       }
 
       if (type === 1)
         this.accountInfo = res;
-      else  
+      else
         this.accountInfoByScatter = res
       console.log("getAccountInfo", res)
       return res;
     } catch (err) {
       console.log("getAccountInfo err", err)
+    }
+  }
+
+  async createNewAccount(value) {
+    try {
+      this.isCreating = true;
+      const res = await this.eosService.createNewAccount(value.name, value.creator, value.pubkey, value.privatekey,
+        value.ram, value.stake_net_quantity, value.stake_cpu_quantity)
+      console.log("createNewAccmount", res)
+      this.successNewaccount = res.toString()
+      this.isCreating = false;
+    } catch (error) {
+      console.log("createNewAccmount", error)
+      this.errNewaccount = error.toString()
+      this.isCreating = false;
     }
   }
 }
