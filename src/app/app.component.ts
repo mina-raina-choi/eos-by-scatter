@@ -16,7 +16,7 @@ export class AppComponent implements OnInit {
   eosPubKey: string;
   eosAccountName: string;
   eosAuthority: string;
-  eosBalance: string;
+  accountInfoByScatter: any;
 
   transferForm: FormGroup;
   errorMsg: string = '';
@@ -30,6 +30,9 @@ export class AppComponent implements OnInit {
 
   formBalance: FormGroup;
   balanceBySearching: string;
+
+  formAccountInfo: FormGroup;
+  accountInfo: any;
 
   constructor(private scatterService: ScatterService, private renderer: Renderer2, fb: FormBuilder, private eosService: EosService) {
     renderer.listen('document', 'scatterLoaded', () => {
@@ -54,6 +57,10 @@ export class AppComponent implements OnInit {
     this.formBalance = fb.group({
       'accountName': ['', Validators.required]
     })
+
+    this.formAccountInfo = fb.group({
+      'accountName': ['', Validators.required]
+    })
   }
 
   ngOnInit() {
@@ -71,7 +78,8 @@ export class AppComponent implements OnInit {
       this.eosAuthority = identity.accounts[0].authority;
       this.eosHash = identity.hash;
       this.eosPubKey = identity.publicKey;
-      this.getBalance(this.eosAccountName)
+      // this.getBalance(this.eosAccountName)
+      this.getAccountInfo(this.eosAccountName, 2)
 
     }, error => {
       console.log("failed", error)
@@ -86,7 +94,7 @@ export class AppComponent implements OnInit {
     this.eosPubKey = "";
     this.eosAccountName = "";
     this.eosAuthority = "";
-    this.eosBalance = "";
+    this.accountInfoByScatter = null
   }
 
   async transfer(value) {
@@ -141,12 +149,40 @@ export class AppComponent implements OnInit {
     }
   }
 
-  async getBalance(account) {
-    this.eosBalance = await this.eosService.getBalance(account)
-  }
-
   async getBalanceBySearching(account) {
-    this.balanceBySearching = await this.eosService.getBalance(account)
+    try {
+      this.balanceBySearching = await this.eosService.getBalance(account)
+      this.formBalance.reset()
+    } catch (err) {
+      console.log("app.component.ts getBalanceBySearching error", err)
+    }
   }
 
+  async getAccountInfo(account, type) {
+    try {
+      const res = await this.eosService.getAccount(account)
+      res.core_liquid_balance = res.core_liquid_balance.replace(" EOS", "")
+      res.total_balance = res.core_liquid_balance
+      res.staked = 0;
+      res.refund = 0;
+      if(res.voter_info) {
+        if(res.voter_info.staked) {
+          res.total_balance =  new Decimal(res.voter_info.staked).div(Math.pow(10, 4)).add(res.core_liquid_balance)
+          res.staked = new Decimal(res.voter_info.staked).div(Math.pow(10, 4))
+        }
+  
+        if(res.voter_info.refund)
+          res.refund = new Decimal(res.voter_info.refund).div(Math.pow(10, 4))
+      }
+
+      if (type === 1)
+        this.accountInfo = res;
+      else  
+        this.accountInfoByScatter = res
+      console.log("getAccountInfo", res)
+      return res;
+    } catch (err) {
+      console.log("getAccountInfo err", err)
+    }
+  }
 }

@@ -4,6 +4,14 @@ import * as Eos from 'eosjs';
 @Injectable()
 export class EosService {
     eos: any;
+    CONFIG = {
+        chainId: 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906',
+        httpEndpoint: 'https://api.eosnewyork.io:443',
+        expireInSeconds: 60,
+        broadcast: true,
+        verbose: false, // API activity
+        sign: true
+    }
 
     constructor() {
     }
@@ -36,12 +44,12 @@ export class EosService {
             return this.eos.transfer(fromAccount, toAccount, DecimalPad(toAmount, precision) + ' EOS', toMemo)
         } catch (error) {
             const err = error.toString().replace("AssertionError ", "")
-            console.log("eos.service", err, error)
             throw err
         }
     }
 
     getInfo() {
+        this.connectNode(this.CONFIG)
         this.eos.getInfo({}).then(res => {
             console.log("getInfo", res)
         }, error => {
@@ -49,17 +57,24 @@ export class EosService {
         })
     }
 
+    getAccount(account_name) {
+        this.connectNode(this.CONFIG)
+        return this.eos.getAccount(account_name)
+    }
+
+
+    getKeyAccounts(pubKey) {
+        this.connectNode(this.CONFIG)
+        this.eos.getKeyAccounts({ "public_key": pubKey }).then(res => {
+            console.log("getKeyAccounts", res, res.account_names[0])
+        }, err => {
+            console.log("getKeyAccounts", err)
+        })
+    }
+
     async getBalance(myaccount) {
-        const config = {
-            chainId: 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906',
-            httpEndpoint: 'https://api.eosnewyork.io:443',
-            expireInSeconds: 60,
-            broadcast: true,
-            verbose: false, // API activity
-            sign: true
-        }
         try {
-            this.connectNode(config);
+            this.connectNode(this.CONFIG);
             const res = await this.eos.getCurrencyBalance({
                 code: 'eosio.token',
                 symbol: 'EOS',
@@ -68,8 +83,7 @@ export class EosService {
             console.log("getBalance", res)
             return res[0]
         } catch (error) {
-            console.log("getBalance error", error)
-
+            throw error
             //  this.eos.getCurrencyBalance(myaccount, myaccount, 'EOS')
             // {"code":500,"message":"Internal Service Error","error":{"code":3060003,"name":"contract_table_query_exception","what":"Contract Table Query Exception","details":[]}}
 

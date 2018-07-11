@@ -21,18 +21,20 @@
     <button class="ui button black" [class.disabled]="!noScatter" (click)="login()">Login</button>
     <button class="ui button black" [class.disabled]="!noScatter" (click)="logout()">Logout</button>
     <div class="ui divider"></div>
-    <h3>
-      <strong>EOS Account Name : </strong>
-      <b>{{eosAccountName}}</b>
-    </h3>
-    <h3>
-      <strong>EOS Balance : </strong>{{eosBalance}}</h3>
-    <h5>
-      <strong>EOS Authority : </strong>{{eosAuthority}}</h5>
-    <h5>
-      <strong>hash : </strong>{{eosHash}}</h5>
-    <h5>
-      <strong>EOS Public Key : </strong>{{eosPubKey}}</h5>
+    <h5>EOS Account Name : {{eosAccountName}}</h5>
+    <!-- <h5>EOS Authority : {{eosAuthority}}</h5>
+    <h5>hash : {{eosHash}}</h5> -->
+    <h5>EOS Public Key : {{eosPubKey}}</h5>
+    <div class="ui divider"></div>
+    <div class="ui" *ngIf="accountInfoByScatter">
+      <h5>Total Balance : {{accountInfoByScatter.total_balance}} EOS</h5>
+      <h5>Unstaked : {{accountInfoByScatter.core_liquid_balance}} EOS</h5>
+      <h5>Staked : {{accountInfoByScatter.staked}} EOS</h5>
+      <h5>Refund : {{accountInfoByScatter.refund}} EOS</h5>
+      <h5>Memory : {{accountInfoByScatter.ram_usage}} / {{accountInfoByScatter.ram_quota}}</h5>
+      <h5>CPU : {{accountInfoByScatter.cpu_limit.used}} / {{accountInfoByScatter.cpu_limit.max}} ({{accountInfoByScatter.total_resources.cpu_weight}})</h5>
+      <h5>Bandwidth : {{accountInfoByScatter.net_limit.used}} / {{accountInfoByScatter.net_limit.max}} ({{accountInfoByScatter.total_resources.net_weight}})</h5>
+    </div>
 
   </div>
   <div class="ui segment">
@@ -132,5 +134,27 @@
     </form>
     <div class="ui divider"></div>
     <h3 class="ui">{{balanceBySearching}}</h3>
+  </div>
+
+
+  <div class="ui segment">
+    <h2 class="ui header">EOS 계정 정보 by AccountName</h2>
+    <form [formGroup]="formAccountInfo" (ngSubmit)="getAccountInfo(formAccountInfo.value.accountName, 1)">
+      <div class="ui input">
+        <input type="text" placeholder="계정이름" [formControl]="formAccountInfo.controls['accountName']">
+      </div>
+      <button class="ui button black" type="submit"  [class.disabled]="!formAccountInfo.valid">Get Account Info</button>
+    </form>
+    <div class="ui divider"></div>
+    <div class="ui" *ngIf="accountInfo">
+      <h5>Accuont Name : {{accountInfo.account_name}}</h5>
+      <h5>Total Balance : {{accountInfo.total_balance}} EOS</h5>
+      <h5>Unstaked : {{accountInfo.core_liquid_balance}} EOS</h5>
+      <h5>Staked : {{accountInfo.staked}} EOS</h5>
+      <h5>Refund : {{accountInfo.refund}} EOS</h5>
+      <h5>Memory : {{accountInfo.ram_usage}} byte / {{accountInfo.ram_quota}} byte</h5>
+      <h5>CPU : {{accountInfo.cpu_limit.used}} / {{accountInfo.cpu_limit.max}} ({{accountInfo.total_resources.cpu_weight}})</h5>
+      <h5>Bandwidth : {{accountInfo.net_limit.used}} byte / {{accountInfo.net_limit.max}} byte ({{accountInfo.total_resources.net_weight}})</h5>
+    </div>
   </div>
 </div>
