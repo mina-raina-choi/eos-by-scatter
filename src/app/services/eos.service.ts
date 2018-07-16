@@ -113,6 +113,7 @@ export class EosService {
 
         console.log("createNewAccount", name, creator, pubKey, privateKey, ram_bytes, DecimalPad(stake_net_quantity, precision), DecimalPad(stake_cpu_quantity, precision))
         return this.eos.transaction(tr => {
+            console.log("tr", tr)
             tr.newaccount({
                 creator: creator,
                 name: name,

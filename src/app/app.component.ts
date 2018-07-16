@@ -186,7 +186,9 @@ export class AppComponent implements OnInit {
   async getAccountInfo(account, type) {
     try {
       const res = await this.eosService.getAccount(account)
-      res.core_liquid_balance = res.core_liquid_balance.replace(" EOS", "")
+      res.core_liquid_balance = 0;
+      if ((res.core_liquid_balance).toString().indexOf("EOS") > -1) 
+        res.core_liquid_balance = res.core_liquid_balance.replace(" EOS", "");      
       res.total_balance = res.core_liquid_balance
       res.staked = 0;
       res.refund = 0;
