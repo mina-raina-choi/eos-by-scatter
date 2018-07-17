@@ -6,11 +6,13 @@ import { EosService } from './services/eos.service';
 import * as ecc from 'eosjs-ecc';
 
 function pubkeyValidator(control: FormControl): { [s: string]: boolean }  {
-  return  { invalidPubkey : !ecc.isValidPublic(control.value)} 
+  if(!ecc.isValidPublic(control.value))
+   return  { invalidPubkey : true} 
 }
 
 function privatekeyValidator(control: FormControl): { [s: string]: boolean }  {
-  return  { invalidPrivatekey : !ecc.isValidPrivate(control.value)} 
+  if(!ecc.isValidPrivate(control.value)) 
+    return  { invalidPrivatekey : true} 
 }
 
 @Component({
