@@ -136,4 +136,44 @@ export class EosService {
             })
         })
     }
+
+    getTableRows() {
+        this.connectNode(this.CONFIG)
+        this.eos.getAbi('eos2minachoi').then(res => {
+            console.log("getAbi", res)
+        }, err => {
+            console.log("getAbi err", err)
+        })
+
+        this.eos.getActions('eos2minachoi').then(res => {
+            console.log("getActions", res)
+        }, err => {
+            console.log("getActions err", err)
+        })
+
+        this.eos.getTransaction("002fe54855303655439e4a5c34630e1a842584a457d9c1c15536cc7e6ab9f558").then(res=> {
+            console.log('getTx', res)
+        }, err => {
+            console.log("getTx err", err)
+        })
+
+        this.eos.getTableRows({
+            // code:'CONTRACT_NAME',
+            // scope:'SCOPE_ACCOUNT (Normally contract)',
+            // table:'TABLE_NAME',
+            code:"eosio.token",
+            scope: 'eos2minachoi',
+            table:'accounts',
+            json: true,
+        }).then(function(res) {
+            console.log(res);
+        }, err => {
+            console.log(err)
+        });
+    }
+
+    getTxInfo(txid) {
+        this.connectNode(this.CONFIG)
+        return this.eos.getTransaction(txid)
+    }
 }

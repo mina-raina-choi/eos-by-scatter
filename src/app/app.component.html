@@ -227,6 +227,23 @@
       <p>{{successNewaccount}}</p>
     </div>
   </div>
-</div>
 
-<div class="ct-chart ct-perfect-fourth"></div>
+  <div class="ui segment">
+    <h2 class="ui header">EOS 송금 정보 by Txid</h2>
+    <form [formGroup]="formTxInfo" (ngSubmit)="getTxInfo(formTxInfo.value.txid)">
+      <div class="ui input">
+        <input type="text" placeholder="txid" [formControl]="formTxInfo.controls['txid']">
+      </div>
+      <button class="ui button black" type="submit" [class.disabled]="!formTxInfo.valid">Get TXID Info</button>
+    </form>
+    <div class="ui divider"></div>
+    <div class="ui" *ngIf="txInfo">
+      <h5>txid : {{txInfo.id}}</h5>
+      <h5>blocktime : {{txInfo.block_time}}</h5>
+      <h5>fromAccount : {{txInfo.trx.trx.actions[0].data.from}} </h5>
+      <h5>toAccount : {{txInfo.trx.trx.actions[0].data.to}}  </h5>
+      <h5>quantity :  {{txInfo.trx.trx.actions[0].data.quantity}}</h5>
+      <h5>memo :  {{txInfo.trx.trx.actions[0].data.memo}}</h5>
+    </div>
+  </div>
+</div>

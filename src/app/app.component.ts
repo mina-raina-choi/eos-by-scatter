@@ -50,6 +50,9 @@ export class AppComponent implements OnInit {
   errNewaccount: string = '';
   successNewaccount: string = '';
 
+  formTxInfo: FormGroup;
+  txInfo: any;
+
   constructor(private scatterService: ScatterService, private renderer: Renderer2, fb: FormBuilder, private eosService: EosService) {
     renderer.listen('document', 'scatterLoaded', () => {
       this.scatterService.load();
@@ -89,10 +92,13 @@ export class AppComponent implements OnInit {
       'stake_net_quantity': ['', Validators.required],
       'stake_cpu_quantity': ['', Validators.required],
     })
+
+    this.formTxInfo = fb.group({
+      'txid' : ['', Validators.required]
+    })
   }
 
   ngOnInit() {
-    console.log("ecc", ecc)
   }
 
 
@@ -227,6 +233,21 @@ export class AppComponent implements OnInit {
       console.log("createNewAccmount", error)
       this.errNewaccount = error.toString()
       this.isCreating = false;
+    }
+  }
+
+  async getTxInfo(txid) {
+    console.log("txid", txid)
+    try {
+      const res = await this.eosService.getTxInfo(txid)
+      if(res.trx) {
+        this.txInfo = res;
+        this.formTxInfo.reset()
+      } else  
+        this.txInfo = null;
+      console.log('getTxInfo', res)
+    } catch (err) {
+      console.log("getTxInfo", err)
     }
   }
 }
