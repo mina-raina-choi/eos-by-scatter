@@ -99,8 +99,20 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.eosService.getTableRows()
   }
 
+  getBalanceByNodejs() {
+    const body = {
+      "symbol": "EOS",
+      "account" : "getCurrencyBalance"
+    }  
+    try {
+      this.eosService.getBalanceByNodejs(body)
+    } catch (err) {
+      console.log("getBalanceByNodejs", err)
+    }
+  }
 
   // sscatter 관련
 

@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import * as Eos from 'eosjs';
 import Decimal from "decimal.js";
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Injectable()
 export class EosService {
@@ -14,7 +15,7 @@ export class EosService {
         sign: true
     }
 
-    constructor() {
+    constructor(private http: HttpClient) {
     }
 
     connectNode(config) {
@@ -139,34 +140,35 @@ export class EosService {
 
     getTableRows() {
         this.connectNode(this.CONFIG)
-        this.eos.getAbi('eos2minachoi').then(res => {
-            console.log("getAbi", res)
-        }, err => {
-            console.log("getAbi err", err)
-        })
+        // this.eos.getAbi('eos2minachoi').then(res => {
+        //     console.log("getAbi", res)
+        // }, err => {
+        //     console.log("getAbi err", err)
+        // })
 
-        this.eos.getActions('eos2minachoi').then(res => {
-            console.log("getActions", res)
-        }, err => {
-            console.log("getActions err", err)
-        })
+        // this.eos.getActions('eos2minachoi').then(res => {
+        //     console.log("getActions", res)
+        // }, err => {
+        //     console.log("getActions err", err)
+        // })
 
-        this.eos.getTransaction("002fe54855303655439e4a5c34630e1a842584a457d9c1c15536cc7e6ab9f558").then(res=> {
-            console.log('getTx', res)
-        }, err => {
-            console.log("getTx err", err)
-        })
+        // this.eos.getTransaction("002fe54855303655439e4a5c34630e1a842584a457d9c1c15536cc7e6ab9f558").then(res=> {
+        //     console.log('getTx', res)
+        // }, err => {
+        //     console.log("getTx err", err)
+        // })
 
         this.eos.getTableRows({
+            // /opt/EOSmainNet/cleos.sh get table eosio eosio rammarket
             // code:'CONTRACT_NAME',
             // scope:'SCOPE_ACCOUNT (Normally contract)',
             // table:'TABLE_NAME',
-            code:"eosio.token",
-            scope: 'eos2minachoi',
-            table:'accounts',
+            code:"eosio",
+            scope: 'eosio',
+            table:'rammarket',
             json: true,
         }).then(function(res) {
-            console.log(res);
+            console.log(res.rows[0]);
         }, err => {
             console.log(err)
         });
@@ -175,5 +177,12 @@ export class EosService {
     getTxInfo(txid) {
         this.connectNode(this.CONFIG)
         return this.eos.getTransaction(txid)
+    }
+
+    async getBalanceByNodejs(body) {
+        const HEADERS = new HttpHeaders().set('Content-Type', 'application/json')
+        let url = `http://localhost:4040/getCurrencyBalance`;
+        let response = await this.http.post(url, JSON.stringify(body), { headers : HEADERS }).toPromise();;
+        return response
     }
 }
